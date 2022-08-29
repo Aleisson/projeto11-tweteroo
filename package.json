@@ -2,7 +2,7 @@
   "name": "projeto11-tweteroo",
   "type": "module",
   "version": "1.0.0",
-  "description": "",
+  "description": "Driven - Projeto #11 - API Tweteroo Este projeto foi solicitado dia 25/07/2022 (13º semana da turma 07 - Módulo 3: Back-end) na aula de Desenvolvimento web ministrada Prof. Lele;",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,5 +13,13 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.1"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Aleisson/projeto11-tweteroo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Aleisson/projeto11-tweteroo/issues"
+  },
+  "homepage": "https://github.com/Aleisson/projeto11-tweteroo#readme"
 }
