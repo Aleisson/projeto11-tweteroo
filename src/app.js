@@ -7,7 +7,33 @@ app.use(express.json());
 
 
 // const user ={username:"", avatar:""};
-const users = []
+const users = [];
+const tweets = [];
+function filterList(index){
+
+    if(index > 9){
+        return false;
+    }
+
+    return true;
+
+}
+
+function addAvatar(tweet, users){
+
+    if(!tweet){
+        return "sem avatar"
+    }
+
+    const user = users.find(val => val.username === tweet.username);
+    if(!user){
+        return "sem avatar";
+    }
+
+    return user.avatar;
+
+  };
+
 
 app.get("/", (req, res) => {
 
@@ -21,13 +47,36 @@ app.post("/sign-up", (req,res) =>{
    
     const user = req.body;
 
-    console.log(user.username);
-    console.log(user.avatar);
-    console.log(user);
+    users.push(user);
+    // users.forEach(x => console.log(x))
 
 
-    res.send("OK");
+    res.status(201).send({message: "OK"});
 
+})
+
+
+app.post("/tweets", (req, res) =>{
+
+    const tweet = req.body;
+
+    tweets.push(tweet);
+
+    // tweets.forEach(x => console.log(x));
+
+    res.status(201).send({message: "OK"});
+
+})
+
+app.get("/tweets", (req, res)=>{
+
+
+    const tweetsList = tweets.filter(((tweet,index) =>{
+       return filterList(index);
+    }));
+    tweetsList.forEach(x => x.avatar = addAvatar(x, users))
+    // console.log(tweetsList);
+    res.send(tweetsList);
 })
 
 
