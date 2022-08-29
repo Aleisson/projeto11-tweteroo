@@ -70,7 +70,7 @@ app.post("/tweets", (req, res) =>{
 
 app.get("/tweets", (req, res)=>{
 
-
+    // const tweetsList = tweets.splice(-10).reverse();
     const tweetsList = tweets.reverse().filter(((tweet,index) =>{
        return filterList(index);
     }));
