@@ -71,7 +71,7 @@ app.post("/tweets", (req, res) =>{
 app.get("/tweets", (req, res)=>{
 
 
-    const tweetsList = tweets.filter(((tweet,index) =>{
+    const tweetsList = tweets.reverse().filter(((tweet,index) =>{
        return filterList(index);
     }));
     tweetsList.forEach(x => x.avatar = addAvatar(x, users))
