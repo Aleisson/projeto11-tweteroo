@@ -1,0 +1,112 @@
+import express from "express";
+import cors from "cors";
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+const users = [];
+const tweets = [];
+
+app.post("/sign-up", (req, res) => {
+  const { username, avatar } = req.body;
+
+  if (!username || !avatar) {
+    res.status(400).send({ message: "Todos os campos são obrigatórios!" });
+    return;
+  }
+
+  // Verifica se na lista de users existe o username enviado no body e adiciona na variável
+  const isUserExists = users.find((user) => user.username === username);
+
+  // Se tiver alguma coisa nessa variável, retorna o erro.
+  if (isUserExists) {
+    res.status(400).send({ message: "Usuário já existente!" });
+    return;
+  }
+
+  users.push({ username, avatar });
+
+  res.status(201).send({ message: "OK" });
+});
+
+app.post("/tweets", (req, res) => {
+  const { user: username } = req.headers;
+  const { tweet } = req.body;
+
+  if (!username || !tweet) {
+    res.status(400).send({ message: "Todos os campos são obrigatórios!" });
+    return;
+  }
+
+  tweets.push({ username, tweet });
+
+  res.status(201).send({ message: "OK" });
+});
+
+app.get("/tweets", (req, res) => {
+  // itera o array de tweets com forEach
+  tweets.forEach((tweet) => {
+    //busca cada avatar de cada usuário contido no tweet
+    const { avatar } = users.find((user) => user.username === tweet.username);
+    // insere um novo campo em cada objeto tweet com o avatar que ele achou naquela "volta" da iteração
+    tweet.avatar = avatar;
+  });
+
+  // Agora teremos um array de tweets com o username e o avatar, sem cadastrar no tweet o avatar
+  const ultimosDez = tweets.slice(-10);
+
+  res.send(ultimosDez);
+});
+
+/*
+
+GET /tweets com paginação
+
+app.get('/tweets', (req, res) => {
+  const { page } = req.query; // Pega um query param chamado page
+
+  if (page && page < 1) { // Verifica se a pagina existe e se ela é menor que 1
+    res.status(400).send('Informe uma página válida!');
+    return;
+  }
+  const limite = 10; // limite de itens na tela
+  const start = (page - 1) * limite; // Diminuimos menos 1 para conseguir pegar o inicio do array de tweets
+  const end = page * limite; // Pegamos o numero da página multiplicado pelo limite (10)
+
+  // Exemplo do start e end: 
+  //Se tivermos 20 itens no array, e a page for a 1, iremos pegar o start que será: 0x10 = 0, ou seja, pegue desde a posição 0 do array, o end será 1x10, ou seja pegue até o item 10 
+  // Se a page for 2, o start que será: 1x10 = 10, ou seja, pegue desde a posição 10 do array, o end será 2x10, ou seja pegue até o item 20 
+
+	// itera o array de tweets com forEach
+  tweets.forEach((tweet) => {
+    //busca cada avatar de cada usuário contido no tweet
+    const { avatar } = users.find((user) => user.username === tweet.username);
+    // insere um novo campo em cada objeto tweet com o avatar que ele achou naquela "volta" da iteração
+    tweet.avatar = avatar;
+  }); 
+
+  if (tweets.length <= 10) { se tiver menos, ou 10 itens no array, retorna todos.
+    return res.send(reverseTweets());
+  }
+
+  // Se tiver mais que 10, faça o reverse, mas aplique o slice com o start e o end.
+  res.status(200).send([...tweets].reverse().slice(start, end));
+});
+
+// função para inverter a ordem do array - ATENÇÃO: ESSA FUNCTION ESTÁ FORA DE TODAS AS ROTAS.
+function reverseTweets() {
+  return [...tweets].reverse();
+}
+
+*/
+app.get("/tweets/:username", (req, res) => {
+  const { username } = req.params;
+
+  const tweetsDoUser = tweets.filter((tweet) => tweet.username === username);
+
+  res.send(tweetsDoUser);
+});
+
+app.listen(5000, () => console.log("listening on port 5000"));
