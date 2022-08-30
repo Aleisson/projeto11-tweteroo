@@ -9,6 +9,8 @@ app.use(express.json());
 // const user ={username:"", avatar:""};
 const users = [];
 const tweets = [];
+
+//modo que eu fiz
 // function filterList(index){
 
 //     if(index > 9){
@@ -18,70 +20,92 @@ const tweets = [];
 //     return true;
 
 // }
-//modo que eu fiz
-// function addAvatar(tweet, users){
+function addAvatar(tweet, users) {
 
-//     if(!tweet){
-//         return "sem avatar"
-//     }
+    if (!tweet) {
+        return "sem avatar"
+    }
 
-//     const user = users.find(val => val.username === tweet.username);
-//     if(!user){
-//         return "sem avatar";
-//     }
+    const user = users.find(val => val.username === tweet.username);
+    if (!user) {
+        return "sem avatar";
+    }
 
-//     return user.avatar;
+    return user.avatar;
 
-//   };
+};
 
 
 app.get("/", (req, res) => {
 
     res.send("<h1>Api Tweteroo</h1>")
-    
+
 
 })
 
-app.post("/sign-up", (req,res) =>{
+app.post("/sign-up", (req, res) => {
 
-   
-    const user = req.body;
+    const { username, avatar } = req.body;
 
-    users.push(user);
-    // users.forEach(x => console.log(x))
+    if (!username || !avatar) {
+        res.status(400).send({ erro: "Todos os campos são obrigatórios!" });
+        return;
+    }
 
-
-    res.status(201).send({message: "OK"});
-
-})
+    users.push({ username, avatar });
 
 
-app.post("/tweets", (req, res) =>{
-    
-    const {username, tweet} = req.body;
-    const { avatar } = users.find(val => val.username === username);
-  
-    // console.log("aqui" + avatar);
-    tweets.push({username, tweet, avatar});
 
-    // tweets.forEach(x => console.log(x));
-
-    res.status(201).send({message: "OK"});
+    res.status(201).send({ message: "OK" });
 
 })
 
-app.get("/tweets", (req, res)=>{
 
-    const tweetsList = tweets;
-    tweetsList.slice(-10).reverse();
-    
-   //modo como fiz
-    // const tweetsList = tweets.reverse().filter(((tweet,index) =>{
-    //    return filterList(index);
-    // }));
-    // tweetsList.forEach(x => x.avatar = addAvatar(x, users))
-    // console.log(tweetsList);
+app.post("/tweets", (req, res) => {
+
+    const { username, tweet } = req.body;
+
+    if (!username || !tweet) {
+        res.status(400).send({ erro: "Todos os campos são obrigatórios!" });
+        return;
+    }
+
+
+    tweets.push({ username, tweet });
+
+
+    res.status(201).send({ message: "OK" });
+
+})
+
+app.get("/tweets", (req, res) => {
+
+
+
+    const tweetsList = tweets.slice(-10);
+
+
+
+    //modo como fiz
+
+    tweetsList.forEach(tweet => tweet.avatar = addAvatar(tweet, users))
+
+
     res.send(tweetsList);
+
+})
+
+
+app.get("/tweets/:username", (req, res) => {
+
+    const { username } = req.params;
+
+    const tweetsUser = tweets.filter(tweet => tweet.username === username);
+
+    tweetsUser.forEach(tweet => tweet.avatar = addAvatar(tweet, users))
+
+    res.status(200).send(tweetsUser);
+
 })
 
 
