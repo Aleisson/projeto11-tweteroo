@@ -45,6 +45,7 @@ app.get("/", (req, res) => {
 
 app.post("/sign-up", (req, res) => {
 
+   
     const { username, avatar } = req.body;
 
     if (!username || !avatar) {
@@ -62,38 +63,50 @@ app.post("/sign-up", (req, res) => {
 
 
 app.post("/tweets", (req, res) => {
-
-    const { username, tweet } = req.body;
+    const {user: username} = req.headers;
+    const {  tweet } = req.body;
 
     if (!username || !tweet) {
         res.status(400).send({ erro: "Todos os campos são obrigatórios!" });
         return;
     }
 
+    let teste = tweets.length + 1
+    tweets.push({ username, tweet, cont: tweets.length + 1 });
 
-    tweets.push({ username, tweet });
 
-
-    res.status(201).send({ message: "OK" });
+    res.status(201).send({ message: teste });
 
 })
 
 app.get("/tweets", (req, res) => {
 
+    const { page } = req.query;
 
+    if (!page || page < 1) {
+        res.status(400).send({ erro: "Informe uma página válida!" });
+        return;
+    }
+    // console.log("page = " + page);
+    const limite = 10;// limite de itens na tela 
+    const start = (page - 1) * limite;
+    // console.log("start= "+ start)
+    const end = page * limite;
+    // console.log("end= "+ end);
 
-    const tweetsList = tweets.slice(-10);
+    tweets.forEach(tweet => tweet.avatar = addAvatar(tweet, users))
 
+    if (tweets.length <= 10) {
+        res.send([...tweets].reverse());
+        console.log("aqui")
+        return;
+    }
 
-
-    //modo como fiz
-
-    tweetsList.forEach(tweet => tweet.avatar = addAvatar(tweet, users))
-
-
-    res.send(tweetsList);
+    res.status(200).send([...tweets].slice(start, end).reverse());
 
 })
+
+
 
 
 app.get("/tweets/:username", (req, res) => {
